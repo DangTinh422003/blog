@@ -1,19 +1,19 @@
-import "@/dbs/init.mongodb";
+import '@/dbs/init.mongodb';
 
-import compression from "compression";
-import cookieParser from "cookie-parser";
-import cors from "cors";
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express, {
   type NextFunction,
   type Request,
   type Response,
-} from "express";
-import helmet from "helmet";
-import morgan from "morgan";
+} from 'express';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
-import { corsConfig } from "@/configs/cors.config";
-import { CustomError } from "@/core/error.response";
-import router from "@/routes";
+import { corsConfig } from '@/configs/cors.config';
+import { CustomError } from '@/core/error.response';
+import router from '@/routes';
 
 const app = express();
 
@@ -21,7 +21,7 @@ const configureMiddlewares = (app: express.Application) => {
   app.use(cors(corsConfig));
   app.use(helmet());
   app.use(compression());
-  app.use(morgan("short"));
+  app.use(morgan('short'));
   app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -29,8 +29,9 @@ const configureMiddlewares = (app: express.Application) => {
 
 const configureRoutes = (app: express.Application) => {
   app.use(router);
+
   app.use((req, res, next) => {
-    next(new CustomError("Not found", 404));
+    next(new CustomError('Not found', 404));
   });
 };
 
@@ -38,9 +39,9 @@ const configureErrorHandling = (app: express.Application) => {
   app.use(
     (err: CustomError, req: Request, res: Response, next: NextFunction) => {
       const status = err.status || 500;
-      res.status(500).json({
+      res.status(status).json({
         status,
-        message: err.message || "Internal server error",
+        message: err.message || 'Internal server error',
       });
     },
   );
