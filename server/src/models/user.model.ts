@@ -14,6 +14,7 @@ const userSchema = new Schema(
     fullName: {
       type: String,
       default: '',
+      index: true,
     },
     createdAt: {
       type: Date,

@@ -22,7 +22,7 @@ const otpSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: 5,
+      expires: 60,
     },
   },
   {

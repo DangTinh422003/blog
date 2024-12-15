@@ -4,6 +4,8 @@ import JWT, {
   type Secret,
 } from 'jsonwebtoken';
 
+import { BadRequestError } from '@/core/error.response';
+
 export default class TokenService {
   generateToken(
     payload: JwtPayload,
@@ -14,6 +16,10 @@ export default class TokenService {
   }
 
   verifyToken<T>(token: string, privateKey: string) {
-    return JWT.verify(token, privateKey) as T;
+    try {
+      return JWT.verify(token, privateKey) as T;
+    } catch (error) {
+      throw new BadRequestError('Invalid token');
+    }
   }
 }

@@ -1,13 +1,15 @@
 import { env } from 'node:process';
 
+import { type JwtPayload } from 'jsonwebtoken';
 import type Mail from 'nodemailer/lib/mailer';
 
-import { InternalServerError } from '@/core/error.response';
-import { OkResponse } from '@/core/success.response';
+import { BadRequestError, InternalServerError } from '@/core/error.response';
+import { CreatedResponse, OkResponse } from '@/core/success.response';
 import otpModel from '@/models/otp.model';
+import userModel from '@/models/user.model';
 import EmailService from '@/services/email.service';
 import TokenService from '@/services/token.service';
-import welcomeTemplate from '@/utils/email.template/welcome.template';
+import welcomeTemplate from '@/utils/email/welcome.template';
 
 const tokenService = new TokenService();
 const emailService = new EmailService();
@@ -65,7 +67,47 @@ export default class AccessService {
 
   signIn() {}
 
-  verifyOtp() {}
+  async verifyOtp(token: string) {
+    const decoded: JwtPayload = tokenService.verifyToken(
+      token,
+      process.env.SIGN_UP_TOKEN_PRIVATE_KEY!,
+    );
+
+    const email: string = decoded.email;
+
+    const userHolder = await userModel.findOne({ email }).lean();
+    if (userHolder) {
+      throw new BadRequestError('Email already exists');
+    }
+
+    const newUser = (await userModel.create({ email })).toObject();
+
+    const [accessToken, refreshToken] = await Promise.all([
+      tokenService.generateToken(
+        newUser,
+        process.env.ACCESS_TOKEN_PRIVATE_KEY!,
+        '3h',
+      ),
+      tokenService.generateToken(
+        newUser,
+        process.env.REFRESH_TOKEN_PRIVATE_KEY!,
+        '7d',
+      ),
+    ]);
+
+    console.log({
+      accessToken,
+      refreshToken,
+    });
+
+    return new CreatedResponse('User created', {
+      user: newUser,
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  }
 
   refreshToken() {}
 }

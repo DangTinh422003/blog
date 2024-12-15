@@ -12,7 +12,10 @@ export default class AccessValidation {
       email: z.string().email(),
     });
 
-    signUpSchema.parse({ email });
+    const check = signUpSchema.safeParse({ email });
+    if (check.error) {
+      throw new BadRequestError('Invalid email');
+    }
 
     const [isEmailRegistered, userHolder] = await Promise.all([
       otpModel.findOne({ email }).lean(),
@@ -26,9 +29,20 @@ export default class AccessValidation {
     }
   }
 
-  signIn(req: Request, res: Response, next: NextFunction) {}
+  signIn(req: Request, res: Response, next: NextFunction) {
+    next();
+  }
 
-  verifyOtp(req: Request, res: Response, next: NextFunction) {}
+  verifyOtp(req: Request, res: Response, next: NextFunction) {
+    const { token } = req.body as { token: string };
+    if (!token) {
+      throw new BadRequestError('Invalid token');
+    }
 
-  refressToken(req: Request, res: Response, next: NextFunction) {}
+    next();
+  }
+
+  refressToken(req: Request, res: Response, next: NextFunction) {
+    next();
+  }
 }

@@ -14,19 +14,15 @@ app.post(
   handleError(accessController.signUp),
 );
 app.post(
-  '/sign-in',
-  handleError(accessValidation.signIn),
-  handleError(accessController.signIn),
-);
-app.post(
   '/verify-otp',
   handleError(accessValidation.verifyOtp),
   handleError(accessController.verifyOtp),
 );
+app.post('/sign-in', accessValidation.signIn, accessController.signIn);
 app.post(
   '/refresh-token',
-  handleError(accessValidation.refressToken),
-  handleError(accessController.refressToken),
+  accessValidation.refressToken,
+  accessController.refressToken,
 );
 
 export default app;

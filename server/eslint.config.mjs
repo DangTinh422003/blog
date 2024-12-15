@@ -41,12 +41,11 @@ const eslintConfig = [
       },
     },
     rules: {
+      '@typescript-eslint/no-unused-vars': 0,
       '@typescript-eslint/no-unsafe-assignment': 0,
       '@typescript-eslint/no-unsafe-call': 0,
-      '@typescript-eslint/no-unused-vars': 0,
       '@typescript-eslint/unbound-method': 0,
       '@typescript-eslint/no-empty-interface': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
       '@typescript-eslint/consistent-type-imports': [
