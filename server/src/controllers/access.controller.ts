@@ -1,6 +1,7 @@
 import { type Request, type Response } from 'express';
 import ms from 'ms';
 
+import { OkResponse } from '@/core/success.response';
 import AccessService from '@/services/access.service';
 
 const accessService = new AccessService();
@@ -55,7 +56,10 @@ export default class AccessController {
   }
 
   signOut(req: Request, res: Response) {
-    res.send('Sign Out');
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    res.send(new OkResponse('Sign out successfully'));
   }
 
   refressToken(req: Request, res: Response) {

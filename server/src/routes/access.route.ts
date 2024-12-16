@@ -26,6 +26,8 @@ app.post(
   handleError(accessController.signIn),
 );
 
+app.post('/sign-out', handleError(accessController.signOut));
+
 app.post(
   '/refresh-token',
   handleError(accessValidation.refressToken),
