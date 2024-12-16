@@ -22,14 +22,33 @@ export default class AccessValidation {
       userModel.findOne({ email }).lean(),
     ]);
 
-    if (!isEmailRegistered && !userHolder) {
-      next();
-    } else {
+    if (isEmailRegistered || userHolder) {
       throw new BadRequestError('Email already registered');
     }
+
+    next();
   }
 
-  signIn(req: Request, res: Response, next: NextFunction) {
+  async signIn(req: Request, res: Response, next: NextFunction) {
+    const { email, password } = req.body as { email: string; password: string };
+    if (!email || !password) {
+      throw new BadRequestError('Invalid email or password');
+    }
+
+    const signUpSchema = z.object({
+      email: z.string().email(),
+    });
+
+    const check = signUpSchema.safeParse({ email });
+    if (check.error) {
+      throw new BadRequestError('Invalid email');
+    }
+
+    const userHolder = await userModel.findOne({ email }).lean();
+    if (!userHolder) {
+      throw new BadRequestError('Invalid email or password');
+    }
+
     next();
   }
 

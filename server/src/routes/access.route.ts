@@ -13,12 +13,15 @@ app.post(
   handleError(accessValidation.signUp),
   handleError(accessController.signUp),
 );
+
 app.post(
   '/verify-otp',
   handleError(accessValidation.verifyOtp),
   handleError(accessController.verifyOtp),
 );
+
 app.post('/sign-in', accessValidation.signIn, accessController.signIn);
+
 app.post(
   '/refresh-token',
   accessValidation.refressToken,
