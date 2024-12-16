@@ -8,7 +8,8 @@ const accessService = new AccessService();
 export default class AccessController {
   async signUp(req: Request, res: Response) {
     const { email } = req.body as { email: string };
-    res.send(await accessService.signUp(email));
+    const data = await accessService.signUp(email);
+    res.send(data);
   }
 
   async verifyOtp(req: Request, res: Response) {

@@ -37,9 +37,9 @@ export default class AccessValidation {
     const { token } = req.body as { token: string };
     if (!token) {
       throw new BadRequestError('Invalid token');
+    } else {
+      next();
     }
-
-    next();
   }
 
   refressToken(req: Request, res: Response, next: NextFunction) {

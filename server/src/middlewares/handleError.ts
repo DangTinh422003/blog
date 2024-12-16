@@ -1,9 +1,16 @@
 import { type NextFunction, type Request, type Response } from 'express';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export const handleError = (fn: Function) => {
+export const handleError = (
+  fn: (req: Request, res: Response, next: NextFunction) => void | Promise<void>,
+) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    fn(req, res, next).catch(next);
+    try {
+      const result = fn(req, res, next);
+      if (result instanceof Promise) {
+        result.catch(next);
+      }
+    } catch (error) {
+      next(error);
+    }
   };
 };

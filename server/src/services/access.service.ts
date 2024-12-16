@@ -1,5 +1,6 @@
 import { env } from 'node:process';
 
+import bcrypt from 'bcrypt';
 import { type JwtPayload } from 'jsonwebtoken';
 import type Mail from 'nodemailer/lib/mailer';
 
@@ -74,13 +75,19 @@ export default class AccessService {
     );
 
     const email: string = decoded.email;
+    if (!email) throw new BadRequestError('Invalid token');
 
     const userHolder = await userModel.findOne({ email }).lean();
     if (userHolder) {
       throw new BadRequestError('Email already exists');
     }
 
-    const newUser = (await userModel.create({ email })).toObject();
+    const SALT = 10;
+    const hashedPassword = await bcrypt.hash(email, SALT);
+
+    const { password, ...newUser } = (
+      await userModel.create({ email, password: hashedPassword })
+    ).toObject();
 
     const [accessToken, refreshToken] = await Promise.all([
       tokenService.generateToken(
@@ -94,11 +101,6 @@ export default class AccessService {
         '7d',
       ),
     ]);
-
-    console.log({
-      accessToken,
-      refreshToken,
-    });
 
     return new CreatedResponse('User created', {
       user: newUser,
