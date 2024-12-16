@@ -66,7 +66,43 @@ export default class AccessService {
     }
   }
 
-  signIn() {}
+  async signIn(email: string, password: string) {
+    const user = await userModel.findOne({ email }).lean();
+    if (!user) {
+      throw new BadRequestError('User not found');
+    }
+    const { password: userPassword, ...userHolder } = user;
+
+    if (!userHolder) {
+      throw new BadRequestError('User not found');
+    }
+
+    const isMatchPwd = await bcrypt.compare(password, userPassword);
+    if (!isMatchPwd) {
+      throw new BadRequestError('Invalid password');
+    }
+
+    const [accessToken, refreshToken] = await Promise.all([
+      tokenService.generateToken(
+        userHolder,
+        process.env.ACCESS_TOKEN_PRIVATE_KEY!,
+        '3h',
+      ),
+      tokenService.generateToken(
+        userHolder,
+        process.env.REFRESH_TOKEN_PRIVATE_KEY!,
+        '7d',
+      ),
+    ]);
+
+    return new OkResponse('Login successfully', {
+      user: userHolder,
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  }
 
   async verifyOtp(token: string) {
     const decoded: JwtPayload = tokenService.verifyToken(

@@ -20,12 +20,16 @@ app.post(
   handleError(accessController.verifyOtp),
 );
 
-app.post('/sign-in', accessValidation.signIn, accessController.signIn);
+app.post(
+  '/sign-in',
+  handleError(accessValidation.signIn),
+  handleError(accessController.signIn),
+);
 
 app.post(
   '/refresh-token',
-  accessValidation.refressToken,
-  accessController.refressToken,
+  handleError(accessValidation.refressToken),
+  handleError(accessController.refressToken),
 );
 
 export default app;

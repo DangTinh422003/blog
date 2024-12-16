@@ -33,8 +33,25 @@ export default class AccessController {
     res.send({ ...data });
   }
 
-  signIn(req: Request, res: Response) {
-    res.send('Sign In');
+  async signIn(req: Request, res: Response) {
+    const { email, password } = req.body as { email: string; password: string };
+    const { data } = await accessService.signIn(email, password);
+
+    res.cookie('accessToken', data?.tokens.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('7 days'),
+    });
+
+    res.cookie('refreshToken', data?.tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('7 days'),
+    });
+
+    res.send({ ...data });
   }
 
   signOut(req: Request, res: Response) {
