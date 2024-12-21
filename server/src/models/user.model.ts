@@ -1,7 +1,7 @@
 import { type InferSchemaType, model, Schema } from 'mongoose';
 
-const DOCUMENT_NAME = 'User';
-const COLLECTION_NAME = 'Users';
+export const DOCUMENT_NAME = 'User';
+export const COLLECTION_NAME = 'Users';
 
 const userSchema = new Schema(
   {

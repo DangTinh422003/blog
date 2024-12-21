@@ -4,7 +4,11 @@ import bcrypt from 'bcrypt';
 import { type JwtPayload } from 'jsonwebtoken';
 import type Mail from 'nodemailer/lib/mailer';
 
-import { BadRequestError, InternalServerError } from '@/core/error.response';
+import {
+  BadRequestError,
+  InternalServerError,
+  UnauthorizedError,
+} from '@/core/error.response';
 import { CreatedResponse, OkResponse } from '@/core/success.response';
 import otpModel from '@/models/otp.model';
 import userModel from '@/models/user.model';
@@ -111,7 +115,7 @@ export default class AccessService {
     );
 
     const email: string = decoded.email;
-    if (!email) throw new BadRequestError('Invalid token');
+    if (!email) throw new BadRequestError('Invalid token ');
 
     const userHolder = await userModel.findOne({ email }).lean();
     if (userHolder) {
@@ -147,5 +151,35 @@ export default class AccessService {
     });
   }
 
-  refreshToken() {}
+  async refreshToken(refreshToken: string) {
+    try {
+      const { iat, exp, ...decoded }: JwtPayload = tokenService.verifyToken(
+        refreshToken,
+        process.env.REFRESH_TOKEN_PRIVATE_KEY!,
+      );
+
+      const [newAccessToken, newRefreshToken] = await Promise.all([
+        tokenService.generateToken(
+          decoded,
+          process.env.ACCESS_TOKEN_PRIVATE_KEY!,
+          '3h',
+        ),
+        tokenService.generateToken(
+          decoded,
+          process.env.REFRESH_TOKEN_PRIVATE_KEY!,
+          '7d',
+        ),
+      ]);
+
+      return new OkResponse('Refresh successful!', {
+        user: decoded,
+        tokens: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken,
+        },
+      });
+    } catch (error) {
+      throw new UnauthorizedError('Invalid token');
+    }
+  }
 }

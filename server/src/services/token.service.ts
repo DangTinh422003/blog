@@ -16,10 +16,6 @@ export default class TokenService {
   }
 
   verifyToken<T>(token: string, privateKey: string) {
-    try {
-      return JWT.verify(token, privateKey) as T;
-    } catch (error) {
-      throw new BadRequestError('Invalid token');
-    }
+    return JWT.verify(token, privateKey) as T;
   }
 }

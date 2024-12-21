@@ -16,7 +16,7 @@
     },
     "typeRoots": ["./node_modules/@types", "./src/@types/*"]
   },
-  "files": ["src/type.d.ts"],
+  "files": ["./src/@types/type.d.ts"],
   "include": ["./src/**/*", "./eslint.config.mjs"],
   "exclude": ["node_modules", "dist"]
 }

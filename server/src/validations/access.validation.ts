@@ -1,7 +1,7 @@
 import { type NextFunction, type Request, type Response } from 'express';
 import { z } from 'zod';
 
-import { BadRequestError } from '@/core/error.response';
+import { BadRequestError, UnauthorizedError } from '@/core/error.response';
 import otpModel from '@/models/otp.model';
 import userModel from '@/models/user.model';
 
@@ -62,6 +62,12 @@ export default class AccessValidation {
   }
 
   refressToken(req: Request, res: Response, next: NextFunction) {
+    const refreshToken: string = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      throw new UnauthorizedError('Unauthorized');
+    }
+
     next();
   }
 }

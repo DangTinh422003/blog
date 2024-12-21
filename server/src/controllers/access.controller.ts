@@ -36,7 +36,7 @@ export default class AccessController {
 
   async signIn(req: Request, res: Response) {
     const { email, password } = req.body as { email: string; password: string };
-    const { data } = await accessService.signIn(email, password);
+    const { data, ...rest } = await accessService.signIn(email, password);
 
     res.cookie('accessToken', data?.tokens.accessToken, {
       httpOnly: true,
@@ -52,7 +52,7 @@ export default class AccessController {
       maxAge: ms('7 days'),
     });
 
-    res.send({ ...data });
+    res.send({ data, ...rest });
   }
 
   signOut(req: Request, res: Response) {
@@ -62,7 +62,25 @@ export default class AccessController {
     res.send(new OkResponse('Sign out successfully'));
   }
 
-  refressToken(req: Request, res: Response) {
-    res.send('Refress Token');
+  async refressToken(req: Request, res: Response) {
+    const refreshToken: string = req.cookies.refreshToken;
+
+    const { data, ...rest } = await accessService.refreshToken(refreshToken);
+
+    res.cookie('accessToken', data?.tokens.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('7 days'),
+    });
+
+    res.cookie('refreshToken', data?.tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('7 days'),
+    });
+
+    res.send({ data, ...rest });
   }
 }
