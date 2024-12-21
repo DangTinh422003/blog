@@ -20,7 +20,7 @@ export const isAuthenticated = async (
 
     const jwtDecoded: JwtPayload = await tokenService.verifyToken(
       accessToken,
-      process.env.ACCESS_TOKEN_SECRET!,
+      process.env.ACCESS_TOKEN_PRIVATE_KEY!,
     );
 
     Object.assign(req, { jwtDecoded });

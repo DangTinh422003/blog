@@ -1,4 +1,10 @@
-import { type InferSchemaType, model, Schema } from 'mongoose';
+import {
+  type InferSchemaType,
+  model,
+  type PaginateModel,
+  Schema,
+} from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import slugify from 'slugify';
 
 import { DOCUMENT_NAME as USER_DOCUMENT_NAME } from '@/models/user.model';
@@ -56,6 +62,8 @@ postSchema.pre('save', function (next) {
   next();
 });
 
+postSchema.plugin(mongoosePaginate);
+
 export type Post = InferSchemaType<typeof postSchema>;
-const postModel = model<Post>(DOCUMENT_NAME, postSchema);
+const postModel = model<Post, PaginateModel<Post>>(DOCUMENT_NAME, postSchema);
 export default postModel;
